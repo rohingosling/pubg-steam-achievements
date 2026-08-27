@@ -59,8 +59,7 @@ pubg-steam-achievements
 │  └─ images                Assets.
 │     ├─ ui                 Page chrome: wordmark, reward banner.
 │     ├─ items/flat         37 row images, 794 x 80.
-│     ├─ screenshots        The screenshot shown at the top of this README.
-│     └─ hero.png           Placeholder banner. Not referenced by the page.
+│     └─ screenshots        The screenshot shown at the top of this README.
 │
 ├─ README.md                This document.
 └─ LICENSE                  MIT licence.

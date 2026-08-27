@@ -5,8 +5,8 @@
 // Description:
 //   Source of truth for the PUBG: BATTLEGROUNDS achievement list.
 //
-//   Transcribed by hand from the Steam client screen captures in `images/Source/`. There is no Steam Web API call and no
-//   API key anywhere in this project — the data is static and is edited here directly.
+//   Transcribed by hand from screen captures of the Steam client's achievement panel. There is no Steam Web API call
+//   and no API key anywhere in this project — the data is static and is edited here directly.
 //
 //   Shipped as a `.js` file rather than `.json` so that a plain `<script>` tag can load it. A `fetch()` against a
 //   `file://` URL is blocked by the browser's origin rules, so a `.json` data file would break the page when
