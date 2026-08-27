@@ -58,7 +58,7 @@
     overflow      : hidden;
     white-space   : nowrap;
     text-overflow : ellipsis;
-    font-size     : var( --font-size-ui );
+    font-size     : var( --font-size-title );
     font-weight   : var( --font-weight-strong );
     color         : var( --colour-text-strong );
     user-select   : none;

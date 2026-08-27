@@ -136,8 +136,15 @@
     --font-family-ui          : system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --font-size-ui            : 13px;
     --font-weight-ui          : 400;
-    --font-weight-strong      : 700;        /* List title only. Nothing else on the page is bold. */
     --line-height-ui          : 1.4;
+
+    /* The list title, and only the list title. It is a point above the UI size rather than the same size, so that it
+       reads as the name of the card rather than as another control label -- but it stays well under the sort
+       control's height beside it, so the control bar's height is still the control's and the list geometry below is
+       untouched. Raising this past roughly 20px starts driving the bar's height instead of fitting inside it. */
+
+    --font-size-title         : 14px;
+    --font-weight-strong      : 700;        /* List title only. Nothing else on the page is bold. */
 
     /*------------------------------------------------------------------------------------------------------------------
        Motion.
