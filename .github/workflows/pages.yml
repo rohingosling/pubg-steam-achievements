@@ -1,0 +1,63 @@
+# Deploy the site to GitHub Pages.
+#
+# The published repository keeps its source under src/, so Pages cannot serve it with a
+# branch deploy -- that mode offers only the repository root or /docs. This workflow
+# uploads src/ as the deployment artifact instead, which makes it the site root: the
+# live URL stays https://rohingosling.github.io/pubg-steam-achievements/ with no /src/
+# segment in it.
+#
+# There is no build step and there never should be. The site is vanilla HTML, CSS, and
+# JavaScript with no bundler, no package manager, and no dependencies, so this workflow
+# checks the tree out and uploads it verbatim. Anything that compiles, installs, or
+# fetches does not belong here.
+#
+# Pages must be configured with source "GitHub Actions" for this to run. A branch deploy
+# would serve the repository root, where there is no index.html.
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+# Least privilege: read the tree, mint the deployment token, write the Pages deployment.
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time. In-progress runs are allowed to finish rather than being
+# cancelled, so a queued push cannot leave a half-published site.
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url:  ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload src/ as the site root
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./src
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,159 @@
+/*----------------------------------------------------------------------------------------------------------------------
+   File:   css/tokens.css
+   Author: Rohin Gosling
+
+   Description:
+
+     The design tokens -- palette, geometry, typography, and motion -- declared once as custom properties on :root.
+     This is the only stylesheet in which a literal colour value or a literal dimension appears; layout.css and
+     components.css consume these properties and never restate a raw value.
+
+     Every colour below was sampled from a shipped asset rather than chosen. The page frames raster images whose
+     colours are already fixed, so the chrome has no freedom: it either sits in the same visual family as the images
+     it surrounds, or it does not. Sampling is what guarantees the former. This is also why there is exactly one
+     theme and no prefers-color-scheme variant -- a second theme would require a second set of 37 row images, and the
+     page still could not restyle a row's interior.
+
+     Every dimension derives from two fixed asset sizes -- the row image at 794 x 80 and the reward banner at
+     798 x 60 -- and one rule: no asset is ever displayed larger than its native size. Upscaling a screen capture of
+     11-pixel antialiased text is immediately visible; downscaling it is not. The card width falls out of that
+     arithmetic:
+
+       card width                                                     836px
+         - list border, left                                           -8px    <- the card's own plate surface
+         - list border, right                                          -8px    <- the same
+         = list frame                                                 820px    <- the banner column, to the pixel
+           - inner margin, left                                        -8px
+           - inner margin, right                                       -8px
+           - reserved scrollbar gutter                                -10px
+           = achievement row width                                    794px    <- native, exact, no resample
+         banner column  ( 836 - 8 - 8 )                               820px
+           reward banner rendered at its native width, centred        798px    <- native, exact, no resample
+
+     The list scrolls inside a frame inset one standard gap from the card on the left, the right, and the bottom, so
+     that the card's own plate surface shows through as a border around it. There is no border above, because the
+     frame's top edge meets the control bar across the card's standard block gap -- the same plate again -- and the
+     two read as one surface rather than as two edges.
+
+     Inside that frame the rows are inset another standard gap on every side, which is the gap between two rows, so
+     a row sits the same distance from the frame's edge as it does from its neighbour. The scrollbar takes the last
+     10px of the frame rather than a column of its own outside it, which is what puts exactly one standard gap
+     between a row and the scrollbar and lands the scrollbar's outer edge on the frame's own edge -- and so on the
+     banner column's, since the frame and the banner column are the same 820px column. That matches the Steam panel
+     being reproduced, in which the list is a recessed well and the scrollbar sits inside it.
+----------------------------------------------------------------------------------------------------------------------*/
+
+:root
+{
+    /*------------------------------------------------------------------------------------------------------------------
+       Palette.
+
+       Sampled, not chosen. The source of each value is recorded so that a re-capture can be checked against it.
+    ------------------------------------------------------------------------------------------------------------------*/
+
+    --colour-page             : #0e141b;    /* Gutter between rows in achievement-list.png.      Page background.     */
+    --colour-plate            : #23262e;    /* Flat plate area of any row image.                 Card, control bar.   */
+    --colour-bar              : #2a2a2e;    /* Flat area of the reward banner.                   Sort control border. */
+    --colour-accent           : #1a9fff;    /* Rarity bar in the row images and reward banner.   Focus ring.          */
+    --colour-gold             : #ffc82c;    /* Reward medal in the reward banner.                Reserved accent.     */
+    --colour-text             : #dcdedf;    /* Achievement title and description text.           Primary text.        */
+    --colour-text-muted       : #8b929a;    /* Unlock timestamp text.                            Labels, secondary.   */
+
+    /* The two colours below are derived rather than sampled. No shipped asset contains a scrollbar to sample
+       from, so each is taken from one that was: the track is the plate a fifth darker, the thumb the muted
+       text at 55%. The track is stepped down rather than left at the plate because it is the one plate-
+       coloured surface inside the list frame, and at full strength it matched the card exactly; a fifth
+       gives the channel a value of its own and still leaves it well above the list's background. The thumb
+       stays well clear of both. Neither may be the accent: the accent is the rarity bar, which appears on every row and
+       again in the reward banner, so painting the scrollbar with it puts a second blue element on screen that
+       stands for nothing. */
+
+    --colour-scrollbar-track  : #1c1e25;    /* Derived -- --colour-plate x 0.80.                 Scrollbar track.     */
+    --colour-scrollbar-thumb  : #4c5055;    /* Derived -- --colour-text-muted x 0.55.            Scrollbar thumb.     */
+
+    /*------------------------------------------------------------------------------------------------------------------
+       Geometry.
+
+       The three widths are derived rather than restated, so that changing the card width or the gap propagates
+       correctly instead of silently disagreeing with the arithmetic above.
+    ------------------------------------------------------------------------------------------------------------------*/
+
+    --card-width              : 836px;
+    --gap                     : 8px;
+    --scrollbar-width         : 10px;
+
+    --banner-column-width     : calc( var( --card-width ) - 2 * var( --gap ) );             /* 820px */
+    --row-width               : calc( var( --banner-column-width ) - 2 * var( --gap )
+                                                                  - var( --scrollbar-width ) );   /* 794px */
+    --row-height              : 80px;
+
+    --reward-banner-width     : 798px;
+    --reward-banner-height    : 60px;
+
+    /* The header band's height, and with it the wordmark's rendered size. The asset is 3511 x 1097 -- a 3.2 : 1
+       ratio -- so fitting it to the 820px banner column instead would make the band 256px tall and hand a logo
+       more than a quarter of the viewport. 120px renders the wordmark at 384 x 120, which reads clearly and
+       leaves the list seven full rows at a 900px viewport height. */
+
+    --banner-header-height    : 120px;
+
+    /* Breathing room above the wordmark, on top of the card's own top padding. The band is fitted to the
+       wordmark exactly, so without this the logo begins one standard gap below the card's top edge and reads
+       as pinned to it rather than placed within it. */
+
+    --banner-header-space-top : 10px;
+
+    /* The control bar's inner height. The mark and the sort control both take it, so the bar is this plus a
+       standard gap above and below. */
+
+    --control-height          : 28px;
+
+    /* The sort control's preferred width, not a floor. It is the control's flex basis, so the control takes 360px
+       wherever the bar can afford it -- which is every viewport from 836px up -- and gives width back below that
+       instead of pushing the label off the bar. The longest option label is far wider than any of these, but a
+       select renders its selected option truncated rather than growing, so the width is chosen for the bar rather
+       than for the text. */
+
+    --select-width            : 360px;
+
+    --border-radius           : 2px;
+    --border-width            : 1px;
+    --focus-ring-width        : 2px;
+
+    /*------------------------------------------------------------------------------------------------------------------
+       Typography.
+
+       A system UI stack only. No web font is loaded and nothing is fetched from a CDN, so the page makes no network
+       request of any kind after the initial load.
+    ------------------------------------------------------------------------------------------------------------------*/
+
+    --font-family-ui          : system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-size-ui            : 13px;
+    --font-weight-ui          : 400;
+    --line-height-ui          : 1.4;
+
+    /*------------------------------------------------------------------------------------------------------------------
+       Motion.
+
+       There is no sort animation, so this exists to give any transition introduced later a single place to be
+       suppressed from. See the reduced-motion override below.
+    ------------------------------------------------------------------------------------------------------------------*/
+
+    --transition-duration     : 120ms;
+    --transition-easing       : ease-out;
+}
+
+/*----------------------------------------------------------------------------------------------------------------------
+   Reduced motion.
+
+   Collapsing the duration token to zero is enough: nothing may declare a transition duration except through this
+   token, so suppressing it here suppresses it everywhere.
+----------------------------------------------------------------------------------------------------------------------*/
+
+@media ( prefers-reduced-motion: reduce )
+{
+    :root
+    {
+        --transition-duration : 0ms;
+    }
+}

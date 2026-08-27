@@ -1,0 +1,204 @@
+/*----------------------------------------------------------------------------------------------------------------------
+   File:   css/components.css
+   Author: Rohin Gosling
+
+   Description:
+
+     The individual pieces of chrome: the sort control, the achievement row, and the list viewport's scrollbar. Where
+     layout.css positions the four card blocks relative to one another, this file styles what sits inside them.
+
+     No literal colour or dimension appears in this file. Everything comes from css/tokens.css.
+
+   Notes:
+
+     Nothing here may be more ornamented than the assets it frames. The row images are flat, square-cornered plates,
+     so corner radii, borders, and shadows stay minimal -- the chrome's job is to disappear into the images, not to
+     compete with them.
+
+     This file is loaded last of the three, so a rule here wins a specificity tie against layout.css.
+----------------------------------------------------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------------------------------------------------
+   Sort control.
+
+   A native select, restyled but not replaced. A custom listbox would have to reimplement type-ahead, the arrow and
+   Home/End key model, the platform's own popup behaviour, and the screen-reader semantics -- all of which the native
+   control already has and none of which this page needs to do differently.
+
+   appearance: none removes the platform's own field chrome so that the field can take the sampled palette. That also
+   removes the drop-down arrow, so the arrow is redrawn here. It is drawn as a pair of half-filled gradient squares
+   rather than as a pseudo-element, because a select cannot host generated content, and rather than as an inline SVG
+   data URI, because the colour inside a data URI would be a literal that no token could reach.
+
+   The field sits at the page colour rather than the plate colour: the control bar is already plate, so a recessed
+   darker field reads as an input without needing a border to say so.
+
+   The width is a flex basis with shrink allowed and the automatic minimum size cleared, rather than a min-width. A
+   min-width would have won against max-width -- the cascade resolves max first and min second -- so the control
+   would have held 360px at a 320px viewport and pushed itself and its label straight out of the card. As a basis it
+   is 360px at every width the card is 836px, and gives the difference back below that.
+----------------------------------------------------------------------------------------------------------------------*/
+
+.control-bar__label
+{
+    flex        : 0 0 auto;
+    color       : var( --colour-text-muted );
+    user-select : none;
+}
+
+.control-bar__select
+{
+    flex                : 0 1 var( --select-width );
+    height              : var( --control-height );
+    min-width           : 0;
+    padding-block       : 0;
+    padding-inline      : var( --gap ) calc( 3 * var( --gap ) );
+    appearance          : none;
+    -webkit-appearance  : none;
+    border              : var( --border-width ) solid var( --colour-bar );
+    border-radius       : var( --border-radius );
+    background-color    : var( --colour-page );
+    background-image    : linear-gradient(  45deg, transparent 50%, var( --colour-text-muted ) 50% ),
+                          linear-gradient( 135deg, var( --colour-text-muted ) 50%, transparent 50% );
+    background-position : right calc( var( --gap ) + 5px ) center,
+                          right var( --gap ) center;
+    background-size     : 5px 5px, 5px 5px;
+    background-repeat   : no-repeat;
+    color               : var( --colour-text );
+    font-family         : inherit;
+    font-size           : inherit;
+    line-height         : inherit;
+    cursor              : pointer;
+}
+
+/* The popup is drawn by the platform, not by this page. Naming the colours here keeps the open list from
+   falling back to a system light theme in the engines that do honour them on option elements. */
+
+.control-bar__select option
+{
+    background-color : var( --colour-page );
+    color            : var( --colour-text );
+}
+
+.control-bar__select:hover
+{
+    border-color : var( --colour-text-muted );
+}
+
+/* Keyboard focus only. A visible ring on every mouse click would be noise, but the ring must never be suppressed
+   for keyboard users -- it is the only thing that says where Tab has landed. */
+
+.control-bar__select:focus-visible
+{
+    outline        : var( --focus-ring-width ) solid var( --colour-accent );
+    outline-offset : var( --border-width );
+}
+
+/*----------------------------------------------------------------------------------------------------------------------
+   List viewport focus.
+
+   The list takes focus so that it can be scrolled by keyboard, so it needs a ring saying where Tab has landed --
+   the same accent ring the sort control uses, because the two are the page's only focus targets and a reader should
+   not have to learn two of them.
+
+   The ring is drawn on the list at zero offset, which puts it exactly outside the list's border box. The list fills
+   its frame precisely, so the ring lands on the card's plate in the standard gap that surrounds the frame, clear of
+   both the rows and the two bands drawn over the frame's top and bottom -- an unbroken rectangle rather than one
+   interrupted at either end. Keyboard focus only, for the same reason the control's ring is: a ring around the
+   whole list on every click in it would be noise.
+----------------------------------------------------------------------------------------------------------------------*/
+
+.achievement-list:focus-visible
+{
+    outline        : var( --focus-ring-width ) solid var( --colour-accent );
+    outline-offset : 0;
+}
+
+/*----------------------------------------------------------------------------------------------------------------------
+   Achievement row.
+
+   The row is a plate sliced out of the source capture, so it needs no styling of its own beyond being placed at its
+   native size.
+
+   The row is a display surface and nothing more. It carries no hover state, no cursor change, and no focus target,
+   because there is nothing to activate: everything the row has to say is already baked into the image, and the alt
+   text says the same thing to a screen reader.
+
+   The width is stated here rather than inherited from the list's content box. A row used to take whatever that box
+   was left with once the scrollbar had taken its share, which is exact only where the engine's share is exactly the
+   10px the arithmetic assumed. It is 10px in Chromium, 8px for a thin scrollbar in Firefox, 17px for a classic one,
+   and nothing at all where scrollbars are overlays -- so the same page rendered the same rows at 794px, 804px, and
+   787px depending on the engine and the reader's own scrollbar setting, upscaling a capture of 11-pixel antialiased
+   text in one direction and resampling it in the other.
+
+   A maximum rather than a width, because it must bind in one direction only. At a card width of 836px the content
+   box is at least 794px in every engine, so the row is exactly 794px and the images render 1 : 1. Below 836px the
+   content box is narrower than the maximum, which stops binding, and the rows scale down with the card as before.
+----------------------------------------------------------------------------------------------------------------------*/
+
+.achievement-row
+{
+    flex      : 0 0 auto;
+    max-width : var( --row-width );
+}
+
+.achievement-row__image
+{
+    display : block;
+    width   : 100%;
+    height  : auto;
+}
+
+/*----------------------------------------------------------------------------------------------------------------------
+   List viewport scrollbar.
+
+   Two mechanisms, both applied, because no single one reaches all three engines.
+
+   The standard properties are the ones that carry the palette. `scrollbar-color` is honoured by Firefox, by Chromium
+   from 121, and by Safari from 18.2, which is every engine this project supports. `scrollbar-width: thin` narrows
+   the channel from the platform default to something in scale with the rows, and it is a request rather than a
+   measurement -- the engine picks the width, and it picks 10px in Chromium and 8px for Firefox's thin scrollbar.
+
+   The ::-webkit-scrollbar pseudo-elements below are for Safari before 18.2, which has no standard properties to
+   honour. They are inert wherever the standard ones apply: an engine that understands `scrollbar-width` or
+   `scrollbar-color` on an element stops consulting its scrollbar pseudo-elements for that element entirely.
+
+   These were previously gated behind `@supports not selector( ::-webkit-scrollbar )`, on the reasoning that the
+   engines without WebKit scrollbar pseudo-elements to offer are the ones that need the standard properties. The
+   premise is false and the gate never opened: Firefox parses any unknown `::-webkit-` pseudo-element rather than
+   discarding the rule, for web compatibility, so `selector( ::-webkit-scrollbar )` reports as supported there and
+   `not` is never satisfied. Firefox therefore reached none of the styling and drew a platform scrollbar in platform
+   colours -- and, worse, seeing the pseudo-element rules at all, it took them as a page asking for classic
+   scrollbars and switched this element away from overlay to a 17px one, which is where the rows' 7px of resampling
+   came from. Applying both unconditionally is correct in every engine and is what the gate was trying to express.
+
+   The thumb is the neutral grey rather than the accent. The accent is the rarity bar -- it is already on all 37 rows
+   and in the reward banner, where it carries a meaning -- so spending it again on a scrollbar would put a second
+   blue element beside them that says nothing, and pull the eye to the chrome instead of the content.
+
+   The track is a fifth darker than the plate rather than the plate itself. It is the only plate-coloured surface
+   inside the list frame, and at full strength it matched the card exactly, so the channel read as a strip of card
+   left behind inside the list. A fifth down gives it a value of its own, still well above the list's background.
+----------------------------------------------------------------------------------------------------------------------*/
+
+.achievement-list
+{
+    scrollbar-width : thin;
+    scrollbar-color : var( --colour-scrollbar-thumb ) var( --colour-scrollbar-track );
+}
+
+.achievement-list::-webkit-scrollbar
+{
+    width : var( --scrollbar-width );
+}
+
+.achievement-list::-webkit-scrollbar-track
+{
+    background-color : var( --colour-scrollbar-track );
+}
+
+.achievement-list::-webkit-scrollbar-thumb
+{
+    border-radius    : var( --border-radius );
+    background-color : var( --colour-scrollbar-thumb );
+}

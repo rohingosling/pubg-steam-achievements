@@ -1,0 +1,335 @@
+/*----------------------------------------------------------------------------------------------------------------------
+   File:   css/layout.css
+   Author: Rohin Gosling
+
+   Description:
+
+     The page shell and the card: the base reset, the document background and type, the four card blocks and how they
+     divide the viewport's height between them, and the off-screen utility used by the live region. What sits inside
+     each block -- the sort control, the row, the scrollbar -- is styled in components.css.
+
+     No literal colour or dimension appears in this file. Everything comes from css/tokens.css.
+
+   Notes:
+
+     The image base rule is a shell concern rather than a component one. Every visible element on this page is an
+     image, and each of them is a raster asset with a fixed native size that must never be displayed larger than it
+     was captured at. Capping width at 100% and letting height follow makes "scales down only" the default that a
+     component would have to deliberately opt out of, rather than a property each one has to remember to opt in to.
+
+     The card is a flex column at 100dvh. The three fixed blocks take their intrinsic heights and the list takes
+     whatever is left over, which is what makes the list the only scrolling region and the page itself never scroll.
+     dvh rather than vh, so the layout tracks a collapsing mobile address bar instead of hiding content beneath it.
+----------------------------------------------------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------------------------------------------------
+   Base reset.
+
+   Border-box sizing throughout, so that the padding and the reserved scrollbar gutter subtract from a declared width
+   instead of adding to it. The card arithmetic assumes this.
+----------------------------------------------------------------------------------------------------------------------*/
+
+*,
+*::before,
+*::after
+{
+    box-sizing : border-box;
+}
+
+body,
+h1, h2, h3, h4, h5, h6,
+p,
+ul, ol, li,
+figure
+{
+    margin  : 0;
+    padding : 0;
+}
+
+ul
+{
+    list-style : none;
+}
+
+img
+{
+    display   : block;
+    max-width : 100%;
+    height    : auto;
+}
+
+/*----------------------------------------------------------------------------------------------------------------------
+   Page shell.
+
+   The background is the gutter colour sampled from between the rows of the source capture, so the space around the
+   card reads as the same surface the rows were cut out of.
+
+   The document itself never scrolls. The card is exactly one viewport tall and clips its own overflow, so this is
+   already true by construction; declaring it on the body as well states the intent and holds it if a later block
+   ever grows past its intrinsic height.
+----------------------------------------------------------------------------------------------------------------------*/
+
+html
+{
+    background-color : var( --colour-page );
+}
+
+body
+{
+    overflow                 : hidden;
+    background-color         : var( --colour-page );
+    color                    : var( --colour-text );
+    font-family              : var( --font-family-ui );
+    font-size                : var( --font-size-ui );
+    font-weight              : var( --font-weight-ui );
+    line-height              : var( --line-height-ui );
+    -webkit-font-smoothing   : antialiased;
+    -moz-osx-font-smoothing  : grayscale;
+}
+
+/*----------------------------------------------------------------------------------------------------------------------
+   The card.
+
+   Centred, and exactly as wide as the arithmetic in tokens.css requires -- but only while the viewport can afford
+   it. Below that the card takes the whole viewport and every asset inside it scales down proportionally, which is
+   the only direction any of them may ever scale.
+
+   Height is one viewport with overflow hidden. The card is therefore a fixed frame that the list scrolls inside,
+   rather than a box the page grows to contain.
+----------------------------------------------------------------------------------------------------------------------*/
+
+.card
+{
+    width            : min( var( --card-width ), 100% );
+    height           : 100dvh;
+    margin-inline    : auto;
+    padding-top      : var( --gap );
+    display          : flex;
+    flex-direction   : column;
+    gap              : var( --gap );
+    overflow         : hidden;
+    background-color : var( --colour-plate );
+}
+
+/*----------------------------------------------------------------------------------------------------------------------
+   Card blocks.
+
+   All four blocks are inset by a standard gap on each side, which is what makes the banner column 820px at a card
+   width of 836px. The list's frame takes the same inset as the three fixed blocks, so the frame and the banner
+   column are the same column to the pixel, and the card's own plate surface shows through down either side of the
+   list as its border.
+----------------------------------------------------------------------------------------------------------------------*/
+
+.card__block
+{
+    flex : 0 0 auto;
+}
+
+.banner-header,
+.banner-reward,
+.control-bar,
+.achievement-list-frame
+{
+    margin-inline : var( --gap );
+}
+
+/*----------------------------------------------------------------------------------------------------------------------
+   Block 1 of 4 -- header banner.
+
+   A band of fixed height with the wordmark centred inside it. The image carries both a max-width and a max-height
+   against auto dimensions, so the browser's min/max sizing rules fit it to whichever edge it meets first while
+   preserving its ratio. The band is far shorter than the asset is tall, so the wordmark is always scaled down.
+
+   The margin above is additional to the card's own top padding rather than a replacement for it, and it is declared
+   here rather than folded into that padding because it belongs to the wordmark: the band is fitted to the asset, so
+   the space has to come from outside the band. Flex items do not collapse their margins, so it adds rather than
+   overlaps.
+----------------------------------------------------------------------------------------------------------------------*/
+
+.banner-header
+{
+    height          : var( --banner-header-height );
+    margin-top      : var( --banner-header-space-top );
+    display         : flex;
+    align-items     : center;
+    justify-content : center;
+}
+
+.banner-header__image
+{
+    max-width  : 100%;
+    max-height : 100%;
+    width      : auto;
+    height     : auto;
+}
+
+/*----------------------------------------------------------------------------------------------------------------------
+   Block 2 of 4 -- reward banner.
+
+   The asset's own background is keyed out, so the block paints nothing behind it and the medal, the text, and the
+   bar sit directly on the card surface. That is the point of the transparency: the captured banner reads as part of
+   the card rather than as a slightly differently coloured box laid on top of it.
+
+   It also disposes of an edge case. The banner is 798px native inside an 820px column, so a strip of card shows at
+   each end; painting it would require a backing colour matching the capture exactly, and any drift between the two
+   would show as a seam.
+----------------------------------------------------------------------------------------------------------------------*/
+
+.banner-reward
+{
+    display         : flex;
+    justify-content : center;
+}
+
+.banner-reward__image
+{
+    width     : var( --reward-banner-width );
+    max-width : 100%;
+    height    : auto;
+}
+
+/*----------------------------------------------------------------------------------------------------------------------
+   Block 3 of 4 -- control bar.
+
+   Label and control, pushed to the trailing edge by an auto inline-start margin on the label rather than by a
+   spacer element, so the bar contains only the two things that are actually in it.
+
+   The bar's height is the control's height plus a standard gap above and below.
+----------------------------------------------------------------------------------------------------------------------*/
+
+.control-bar
+{
+    display          : flex;
+    align-items      : center;
+    gap              : var( --gap );
+    padding          : var( --gap );
+    background-color : var( --colour-plate );
+}
+
+.control-bar__label
+{
+    margin-inline-start : auto;
+}
+
+/*----------------------------------------------------------------------------------------------------------------------
+   Block 4 of 4 -- list viewport.
+
+   Two elements rather than one. The frame is the box the list sits in and the only flex item the card sees; the
+   list is the scroll container inside it. They are separate because the frame paints the two bands that hide the
+   rows at the top and bottom of the list, and a scroll container cannot paint over its own overflowing content --
+   its background sits behind that content, and its padding does not clip it -- so the bands have to belong to
+   something outside the scrolling box.
+
+   The frame claims the height the three fixed blocks leave. min-height: 0 is what allows it to be shorter than its
+   own content -- without it, a flex item's automatic minimum size is its content size, the frame would refuse to
+   shrink, and the card would overflow the viewport instead of the list scrolling inside it. It is inset one gap
+   from the card on the left and the right along with the other blocks, and one gap from the bottom, which leaves
+   the card's plate surface showing as a border on those three sides. There is no border above: the frame's top
+   edge meets the control bar across the card's own block gap, which is that same plate, so the two read as one
+   surface rather than as two edges.
+
+   The scrollbar gutter is reserved permanently rather than on demand, so the rows do not shift horizontally at the
+   moment the list becomes scrollable, and do not shift back on a resize that makes it unscrollable again.
+
+     836px  card width
+     -  8px frame margin, left         <- the card's plate, showing through as the list's border
+     -  8px frame margin, right        <- the same
+     = 820px frame  <- the banner column, to the pixel
+       -  8px list padding, left
+       -  8px list padding, right
+       - 10px reserved scrollbar gutter
+       = 794px content box  <- the row images' native width, rendered 1 : 1 with no resample
+
+   That last subtraction is a request, not a measurement. An engine reserves the width of the scrollbar it means to
+   draw, and the widths differ: 10px in Chromium, 8px for a thin scrollbar in Firefox, 17px for a classic one, and
+   nothing at all where scrollbars are drawn as overlays -- macOS by default in every engine, and Windows with
+   "automatically hide scrollbars" turned on. `scrollbar-width: thin` in components.css is what holds every one of
+   them at or below the 10px this sum assumes, so the content box is never narrower than 794px; the row's own
+   maximum width, also in components.css, is what stops it stretching into whatever is left over when the reserved
+   gutter turns out to be narrower than that or is not reserved at all. Between the two the row is exactly 794px in
+   every engine, and the space between it and the scrollbar is the standard gap give or take the two pixels the
+   engines disagree about.
+----------------------------------------------------------------------------------------------------------------------*/
+
+.achievement-list-frame
+{
+    position         : relative;
+    flex             : 1 1 auto;
+    min-height       : 0;
+    display          : flex;
+    margin-block-end : var( --gap );
+    background-color : var( --colour-page );
+}
+
+.achievement-list
+{
+    flex             : 1 1 auto;
+    min-width        : 0;
+    overflow-y       : auto;
+    overflow-x       : hidden;
+    scrollbar-gutter : stable;
+    padding-block    : var( --gap );
+    padding-inline   : var( --gap );
+    display          : flex;
+    flex-direction   : column;
+    gap              : var( --gap );
+}
+
+/*----------------------------------------------------------------------------------------------------------------------
+   The occluding bands.
+
+   The list's block padding puts a standard gap above the first row and below the last one, but padding does not
+   clip: a row scrolled past it is still drawn there, right out to the frame's edge, so a row arriving at the top
+   ran into the control bar above and a row leaving at the bottom ran into the card's own edge below. These two
+   bands are drawn over that padding in the list's background colour, so a row slides underneath one and is gone
+   before it reaches either edge.
+
+   They belong to the frame rather than to the list precisely because they must not scroll, and they stop one
+   scrollbar width short of the trailing edge -- which is exactly the list's padding box -- so the scrollbar runs
+   the full height of the frame instead of being capped at each end.
+
+   They need no z-index. They are positioned and the rows are not, so within the card's stacking context they
+   already paint after every row.
+----------------------------------------------------------------------------------------------------------------------*/
+
+.achievement-list-frame::before,
+.achievement-list-frame::after
+{
+    content          : '';
+    position         : absolute;
+    inset-inline     : 0 var( --scrollbar-width );
+    height           : var( --gap );
+    background-color : var( --colour-page );
+    pointer-events   : none;
+}
+
+.achievement-list-frame::before
+{
+    inset-block-start : 0;
+}
+
+.achievement-list-frame::after
+{
+    inset-block-end : 0;
+}
+
+/*----------------------------------------------------------------------------------------------------------------------
+   Utilities.
+
+   visually-hidden removes an element from the visual page while leaving it in the accessibility tree. It is used by
+   the polite live region that announces the newly applied sort order, which has content for a screen reader and
+   nothing to show anyone else.
+----------------------------------------------------------------------------------------------------------------------*/
+
+.visually-hidden
+{
+    position    : absolute;
+    width       : 1px;
+    height      : 1px;
+    margin      : -1px;
+    padding     : 0;
+    border      : 0;
+    overflow    : hidden;
+    white-space : nowrap;
+    clip-path   : inset( 50% );
+}

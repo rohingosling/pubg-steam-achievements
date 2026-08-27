@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+
+<!----------------------------------------------------------------------------------------------------------------------
+     File:   index.html
+     Author: Rohin Gosling
+
+     Description:
+
+       The single page. Structure only -- there is no inline style attribute, no style element, and no inline script
+       body anywhere in this file. Presentation lives in css/, behaviour lives in js/.
+
+       The card holds exactly four blocks, top to bottom: the wordmark banner, the reward banner, the control bar, and
+       the achievement list. The list is the only region that scrolls; the page itself never does.
+
+       Two things in this file are deliberately left empty and are filled at run time:
+
+         select#sort-field         Populated from the SORT_FIELDS registry by js/app.js. The options are not hardcoded
+                                   here, so the registry stays the single source of truth for the sort order set.
+
+         ul#achievement-list       Populated from the ACHIEVEMENTS array by js/list-view.js. The 37 rows are built
+                                   once at start-up and are thereafter only ever reordered, never re-created.
+
+       The scripts are classic deferred scripts rather than ES modules. A script of type "module" is fetched with CORS
+       semantics and a file:// origin is opaque, so every import would fail when this page is opened directly from
+       disk. Deferred classic scripts download in parallel, execute strictly in document order, and execute after the
+       document has parsed -- which is also why no DOMContentLoaded handler is needed anywhere.
+
+     Notes:
+
+       Every asset referenced below lives under images/ui/ or images/items/, both of which sit inside the publish
+       root and are published. Nothing here may reference the private source artwork one level up -- the Steam screen
+       captures or the raw logo variants -- because it sits outside the publish root and cannot be promoted, so such
+       a reference would work locally and return 404 for every one of those images on GitHub Pages.
+----------------------------------------------------------------------------------------------------------------------->
+
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport"    content="width=device-width, initial-scale=1">
+    <meta name="description" content="An interactive, sortable view of Rohin Gosling's PUBG: BATTLEGROUNDS achievements on Steam.">
+
+    <title>PUBG: BATTLEGROUNDS — Steam Achievements</title>
+
+    <!-- Presentation. Load order matters: tokens defines the custom properties that the other two consume. -->
+
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+
+    <!-- Behaviour. Dependency order: records -> registry -> view -> bootstrap. -->
+
+    <script defer src="data/achievements.js"></script>
+    <script defer src="js/sort-fields.js"></script>
+    <script defer src="js/list-view.js"></script>
+    <script defer src="js/app.js"></script>
+
+</head>
+
+<body>
+
+    <main class="card">
+
+        <!-- Block 1 of 4. Header banner. Not a link, and not interactive. -->
+
+        <header class="card__block banner-header">
+            <img class="banner-header__image"
+                 src="images/ui/pubg-wordmark.png"
+                 width="3511" height="1097"
+                 alt="PUBG: BATTLEGROUNDS">
+        </header>
+
+        <!-- Block 2 of 4. Reward banner. A captured image, not a computed progress bar. -->
+
+        <div class="card__block banner-reward">
+            <img class="banner-reward__image"
+                 src="images/ui/achievements-unlocked.png"
+                 width="798" height="60"
+                 alt="All 37 achievements unlocked.">
+        </div>
+
+        <!-- Block 3 of 4. Control bar. The sort control, right aligned. -->
+
+        <div class="card__block control-bar">
+
+            <label  class="control-bar__label"  for="sort-field">Sort</label>
+            <select class="control-bar__select" id="sort-field"></select>
+
+        </div>
+
+        <!--
+             Block 4 of 4. Achievement list. The only scrolling region on the page. Rows are built and ordered by js/.
+
+             Two elements, not one. The frame is the box the list sits in; the list is the scroll container inside
+             it. The frame paints the bands that hide a row as it scrolls past the top and bottom of the list, and
+             a scroll container cannot paint over its own overflowing content, so the bands need an element that is
+             not the one that scrolls.
+
+             The list carries tabindex="0" so that it can be scrolled by keyboard. A scroll container that cannot
+             take focus cannot be driven by the arrow keys, Page Up/Down, or Home/End in Firefox or Safari -- only
+             Chromium focuses overflowing containers of its own accord -- and the rows are the page's entire
+             content, so without this a keyboard user reaches the sort control and then cannot read past the first
+             screenful. The tabindex does not make a row interactive: it makes the region containing them
+             scrollable, which is the one thing the reader can do here. The label names that region; the list role
+             and its 37 items are the element's own semantics and are unaffected.
+        -->
+
+        <div class="card__block achievement-list-frame">
+            <ul class="achievement-list"
+                id="achievement-list"
+                tabindex="0"
+                aria-label="Achievements"></ul>
+        </div>
+
+    </main>
+
+    <!-- Politely announces the newly applied order after a sort. Off screen, never focusable. -->
+
+    <div class="visually-hidden" id="sort-announcement" role="status" aria-live="polite"></div>
+
+</body>
+
+</html>
