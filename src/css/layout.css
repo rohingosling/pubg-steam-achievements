@@ -191,10 +191,12 @@ body
 /*----------------------------------------------------------------------------------------------------------------------
    Block 3 of 4 -- control bar.
 
-   Label and control, pushed to the trailing edge by an auto inline-start margin on the label rather than by a
-   spacer element, so the bar contains only the two things that are actually in it.
+   Three items: the list title at the leading edge, then the label and the control at the trailing one. The pair is
+   pushed across by an auto inline-start margin on the label rather than by a spacer element, so the bar contains
+   only the three things that are actually in it. The same margin did the same job when the title was not there.
 
-   The bar's height is the control's height plus a standard gap above and below.
+   The bar's height is the control's height plus a standard gap above and below. The title does not change it: it is
+   set at the UI font size, so it is shorter than the control beside it.
 ----------------------------------------------------------------------------------------------------------------------*/
 
 .control-bar

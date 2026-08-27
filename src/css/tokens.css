@@ -71,6 +71,12 @@
     --colour-scrollbar-track  : #1c1e25;    /* Derived -- --colour-plate x 0.80.                 Scrollbar track.     */
     --colour-scrollbar-thumb  : #4c5055;    /* Derived -- --colour-text-muted x 0.55.            Scrollbar thumb.     */
 
+    /* The one colour that is neither sampled nor derived. --colour-text is the brightest value in the row images,
+       so a title painted with it reads as one more row title rather than as the name of the whole card. Pure white
+       is the only value above it, and it paints exactly one element. */
+
+    --colour-text-strong      : #ffffff;    /* Chosen -- one step above --colour-text.           List title.          */
+
     /*------------------------------------------------------------------------------------------------------------------
        Geometry.
 
@@ -130,6 +136,7 @@
     --font-family-ui          : system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --font-size-ui            : 13px;
     --font-weight-ui          : 400;
+    --font-weight-strong      : 700;        /* List title only. Nothing else on the page is bold. */
     --line-height-ui          : 1.4;
 
     /*------------------------------------------------------------------------------------------------------------------

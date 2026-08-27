@@ -39,6 +39,31 @@
    is 360px at every width the card is 836px, and gives the difference back below that.
 ----------------------------------------------------------------------------------------------------------------------*/
 
+/*----------------------------------------------------------------------------------------------------------------------
+   List title.
+
+   The card's name, and the page's only heading. Bold and white against the muted label beside it, at the same size
+   as everything else in the bar -- weight and value carry the emphasis, so the bar's height is unchanged.
+
+   It shrinks and truncates rather than pushing the control out of the card. The bar has a fixed height, so wrapping
+   is not available to it, and the title is the one item here whose width is its content: the label is four
+   characters and the control already gives width back on its own basis. Truncation matches what the control does
+   with a long option.
+----------------------------------------------------------------------------------------------------------------------*/
+
+.control-bar__title
+{
+    flex          : 0 1 auto;
+    min-width     : 0;
+    overflow      : hidden;
+    white-space   : nowrap;
+    text-overflow : ellipsis;
+    font-size     : var( --font-size-ui );
+    font-weight   : var( --font-weight-strong );
+    color         : var( --colour-text-strong );
+    user-select   : none;
+}
+
 .control-bar__label
 {
     flex        : 0 0 auto;
