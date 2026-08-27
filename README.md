@@ -6,7 +6,9 @@
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)
 
 <p align="center">
-  <img src="src/images/screenshots/screenshot.png">
+  <a href="https://rohingosling.github.io/pubg-steam-achievements/">
+    <img src="src/images/screenshots/screenshot.png">
+  </a>
 </p>
 
 A browser-based, sortable view of my **PUBG: BATTLEGROUNDS** achievements on Steam. The Steam client shows achievements in a fixed order with no way to re-order them; this site takes the same 37 records and presents them in a single scrolling card whose order you choose from a dropdown, by rarity, by name, by description, or by unlock date.
